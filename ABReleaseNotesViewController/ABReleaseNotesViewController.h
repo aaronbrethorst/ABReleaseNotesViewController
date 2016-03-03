@@ -66,7 +66,19 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NS_ENUM(NSUInteger, ABReleaseNotesViewControllerMode) {
+    ABReleaseNotesViewControllerModeTesting = 0,
+    ABReleaseNotesViewControllerModeProduction
+};
+
 @interface ABReleaseNotesViewController : UIViewController
+
+/**
+ The `mode` property controls whether the release notes controller always
+ appears for testing purposes, or whether it only appears when an update
+ has actually occurred. By default, this is set to `ABReleaseNotesViewControllerModeTesting`
+ */
+@property(nonatomic,assign) ABReleaseNotesViewControllerMode mode;
 
 /**
  The style of the blur effect to apply to your view's background.

@@ -72,10 +72,13 @@ NSString * const ABReleaseNotesVersionUserDefaultsKey = @"ABReleaseNotesVersionU
 }
 
 - (void)commonInit {
-    _blurEffectStyle = UIBlurEffectStyleLight;
     self.modalPresentationStyle = UIModalPresentationCustom;
     self.transitioningDelegate = self;
-    
+
+    _mode = ABReleaseNotesViewControllerModeTesting;
+
+    _blurEffectStyle = UIBlurEffectStyleLight;
+
     _closeButtonTitle = NSLocalizedString(@"Dismiss", @"");
     
     _lineViewColor = [UIColor colorWithWhite:0.f alpha:0.25f];
@@ -109,7 +112,9 @@ NSString * const ABReleaseNotesVersionUserDefaultsKey = @"ABReleaseNotesVersionU
     [self createVisualEffectsViews];
 
     UINavigationBar *navigationBar = [[UINavigationBar alloc] init];
-    [navigationBar pushNavigationItem:[[UINavigationItem alloc] initWithTitle:self.title] animated:YES];
+
+    NSString *title = self.mode == ABReleaseNotesViewControllerModeProduction ? self.title : [NSString stringWithFormat:@"TESTING - %@", self.title];
+    [navigationBar pushNavigationItem:[[UINavigationItem alloc] initWithTitle:title] animated:YES];
 
     UIView *bottomEdge = [self.class makeLineViewWithColor:self.lineViewColor];
 
@@ -168,24 +173,25 @@ NSString * const ABReleaseNotesVersionUserDefaultsKey = @"ABReleaseNotesVersionU
     if (!hasIdentifier) {
         return;
     }
-    
-    NSString *defaultsAppVersion = [[NSUserDefaults standardUserDefaults] objectForKey:ABReleaseNotesVersionUserDefaultsKey];
-    if (!defaultsAppVersion) {
-        // it's nil, so write out a value first launch and bail.
-        [[NSUserDefaults standardUserDefaults] setObject:[self.class appVersionNumber] forKey:ABReleaseNotesVersionUserDefaultsKey];
-        return;
-    }
 
-    // TODO: put me back!
-//    if ([defaultsAppVersion isEqual:[self.class appVersionNumber]]) {
-//        // no new app version installed since last launch.
-//        return;
-//    }
+    if (self.mode == ABReleaseNotesViewControllerModeProduction) {
+        NSString *defaultsAppVersion = [[NSUserDefaults standardUserDefaults] objectForKey:ABReleaseNotesVersionUserDefaultsKey];
+        if (!defaultsAppVersion) {
+            // it's nil, so write out a value first launch and bail.
+            [[NSUserDefaults standardUserDefaults] setObject:[self.class appVersionNumber] forKey:ABReleaseNotesVersionUserDefaultsKey];
+            return;
+        }
+
+        if ([defaultsAppVersion isEqual:[self.class appVersionNumber]]) {
+            // no new app version installed since last launch.
+            return;
+        }
+    }
 
     // If we've gotten this far, then there's seemingly an update to tell the user about.
     self.downloader = [[ABReleaseNotesDownloader alloc] initWithAppIdentifier:self.appIdentifier];
     [self.downloader checkForUpdates:^(BOOL updated, NSString *releaseNotes, NSString *versionNumber) {
-        if ([versionNumber isEqual:[self.class appVersionNumber]]) {
+        if (self.mode == ABReleaseNotesViewControllerModeProduction && [versionNumber isEqual:[self.class appVersionNumber]]) {
             // Belt and suspenders in case something went wrong.
             NSLog(@"We downloaded release notes, but the version in the App Store is identical to our local version!");
             NSLog(@"Local: %@ - App Store: %@", [self.class appVersionNumber], versionNumber);
