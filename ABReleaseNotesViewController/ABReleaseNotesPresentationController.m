@@ -65,7 +65,16 @@
 }
 
 - (CGRect)frameOfPresentedViewInContainerView {
-    return CGRectInset(self.containerView.bounds, 30, 50);
+    if (self.traitCollection.userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
+        // Phone size should be most of the screen.
+        return CGRectInset(self.containerView.bounds, 30, 50);
+    }
+    else {
+        // Tablet or TV, at least for now. Cap the size at something reasonable.
+        CGRect rect = CGRectMake(0, 0, 400, 400);
+        rect.origin = CGPointMake(self.containerView.center.x - 200.f, self.containerView.center.y - 200);
+        return rect;
+    }
 }
 
 - (void)containerViewWillLayoutSubviews {
