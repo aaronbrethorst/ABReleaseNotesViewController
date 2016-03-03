@@ -37,7 +37,7 @@
 
     if (self) {
         _dimmingView = [[UIView alloc] initWithFrame:CGRectZero];
-        _dimmingView.backgroundColor = [UIColor colorWithWhite:0.f alpha:0.05f];
+        _dimmingView.backgroundColor = [UIColor colorWithWhite:0.f alpha:0.25f];
     }
     return self;
 }
