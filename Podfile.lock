@@ -1,0 +1,14 @@
+PODS:
+  - ABReleaseNotesViewController (0.1.0)
+
+DEPENDENCIES:
+  - ABReleaseNotesViewController (from `.`)
+
+EXTERNAL SOURCES:
+  ABReleaseNotesViewController:
+    :path: "."
+
+SPEC CHECKSUMS:
+  ABReleaseNotesViewController: b378ca2ec9494027a8ea584320453a0697073e56
+
+COCOAPODS: 0.39.0
