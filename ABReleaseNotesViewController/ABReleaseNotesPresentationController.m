@@ -65,7 +65,7 @@
 }
 
 - (CGRect)frameOfPresentedViewInContainerView {
-    return CGRectInset(self.containerView.bounds, 30, 100);
+    return CGRectInset(self.containerView.bounds, 30, 50);
 }
 
 - (void)containerViewWillLayoutSubviews {
