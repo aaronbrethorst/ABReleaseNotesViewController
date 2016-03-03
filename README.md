@@ -1,7 +1,9 @@
 ABReleaseNotesViewController
 ====
 
-`ABReleaseNotesViewController` is an easy-to-use, reasonably attractive way to display your application's release notes in-app. This project was inspired by [https://github.com/iGriever/TWSReleaseNotesView](TWSReleaseNotesView). I've used `TWSReleaseNotesView` in the past, and it was great, but it hasn't been updated in a few years.
+Since iOS 7, users have been opted in to automatic updates of their apps from the App Store. This is great for ensuring that our users are always on the latest versions of our products, but it means that it can be much more difficult to tell them about what's new and different in our updates. `ABReleaseNotesViewController` fixes that by displaying your app's release notes from the App Store inside your app on the first launch after an update.
+
+`ABReleaseNotesViewController` is an easy-to-use, reasonably attractive way to display your application's release notes from the App Store inside your app. This project was inspired by [https://github.com/iGriever/TWSReleaseNotesView](TWSReleaseNotesView). I've used `TWSReleaseNotesView` in the past, and it was great, but it hasn't been updated in a few years.
 
 ![Animated GIF demonstrating the project](http://i.imgur.com/wgwhOY8.gif)
 
