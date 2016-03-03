@@ -91,7 +91,8 @@ NSString * const ABReleaseNotesVersionUserDefaultsKey = @"ABReleaseNotesVersionU
     self.view.layer.shadowColor = [UIColor colorWithRed:0.f green:0.f blue:0.25f alpha:1.f].CGColor;
     self.view.layer.shadowOpacity = 0.25f;
     self.view.layer.shadowRadius = 8.f;
-
+    self.view.layer.borderWidth = 1.f;
+    self.view.layer.borderColor = self.lineViewColor.CGColor;
     [self createVisualEffectsViews];
 
     UINavigationBar *navigationBar = [[UINavigationBar alloc] init];
