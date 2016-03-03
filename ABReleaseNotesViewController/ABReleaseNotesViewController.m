@@ -37,45 +37,58 @@ NSString * const ABReleaseNotesVersionUserDefaultsKey = @"ABReleaseNotesVersionU
 @property(nonatomic,strong) UIVisualEffectView *vibrancyView;
 @property(nonatomic,strong) UILabel *titleLabel;
 @property(nonatomic,strong) UITextView *bodyText;
+@property(nonatomic,copy) UIColor *lineViewColor;
 @end
 
 @implementation ABReleaseNotesViewController
 
-#pragma mark - Initialization
-
-- (instancetype)init {
+- (instancetype)initWithAppIdentifier:(NSString*)appIdentifier {
     self = [super init];
-
+    
     if (self) {
-        _blurEffectStyle = UIBlurEffectStyleLight;
+        self.title = NSLocalizedString(@"Release Notes", @"");
 
-        _closeButtonTitle = NSLocalizedString(@"Dismiss", @"");
-
-        _lineViewColor = [UIColor colorWithWhite:0.f alpha:0.25f];
-
-        _bodyText = ({
-            UITextView *textView = [[UITextView alloc] init];
-            textView.translatesAutoresizingMaskIntoConstraints = NO;
-            textView.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
-            textView.backgroundColor = [UIColor clearColor];
-            textView.editable = NO;
-            textView.selectable = NO;
-            textView;
-        });
+        _appIdentifier = [appIdentifier copy];
+        [self commonInit];
     }
     return self;
 }
 
-+ (id)releaseNotesControllerWithAppIdentifier:(NSString *)appIdentifier title:(NSString *)title {
+- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if (self) {
+        [self commonInit];
+    }
+    return self;
+}
 
-    ABReleaseNotesViewController *controller = [[ABReleaseNotesViewController alloc] init];
-    controller.title = title;
-    controller.appIdentifier = appIdentifier;
-    controller.blurEffectStyle = UIBlurEffectStyleLight;
-    controller.modalPresentationStyle = UIModalPresentationCustom;
-    controller.transitioningDelegate = controller;
+- (instancetype)initWithCoder:(NSCoder *)aDecoder {
+    self = [super initWithCoder:aDecoder];
+    
+    if (self) {
+        [self commonInit];
+    }
+    return self;
+}
 
-    return controller;
+- (void)commonInit {
+    _blurEffectStyle = UIBlurEffectStyleLight;
+    self.modalPresentationStyle = UIModalPresentationCustom;
+    self.transitioningDelegate = self;
+    
+    _closeButtonTitle = NSLocalizedString(@"Dismiss", @"");
+    
+    _lineViewColor = [UIColor colorWithWhite:0.f alpha:0.25f];
+    
+    _bodyText = ({
+        UITextView *textView = [[UITextView alloc] init];
+        textView.translatesAutoresizingMaskIntoConstraints = NO;
+        textView.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+        textView.backgroundColor = [UIColor clearColor];
+        textView.editable = NO;
+        textView.selectable = NO;
+        textView;
+    });
 }
 
 #pragma mark - UIViewController
@@ -149,6 +162,13 @@ NSString * const ABReleaseNotesVersionUserDefaultsKey = @"ABReleaseNotesVersionU
 #pragma mark - Public Methods
 
 - (void)checkForUpdates:(void(^)(BOOL updated))block {
+    
+    BOOL hasIdentifier = self.appIdentifier.length > 0;
+    NSParameterAssert(hasIdentifier);
+    if (!hasIdentifier) {
+        return;
+    }
+    
     NSString *defaultsAppVersion = [[NSUserDefaults standardUserDefaults] objectForKey:ABReleaseNotesVersionUserDefaultsKey];
     if (!defaultsAppVersion) {
         // it's nil, so write out a value first launch and bail.

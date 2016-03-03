@@ -26,7 +26,7 @@
     [self.view addSubview:self.webView];
     [self.webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://www.apple.com"]]];
 
-    self.releaseNotes = [ABReleaseNotesViewController releaseNotesControllerWithAppIdentifier:@"329380089" title:NSLocalizedString(@"Release Notes", @"")];
+    self.releaseNotes = [[ABReleaseNotesViewController alloc] initWithAppIdentifier:@"329380089"];
 }
 
 - (void)viewDidAppear:(BOOL)animated {

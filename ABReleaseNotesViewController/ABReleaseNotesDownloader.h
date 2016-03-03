@@ -26,7 +26,30 @@
 
 #import <Foundation/Foundation.h>
 
+/**
+ Retrieves release notes and the current version number from the App Store for the app whose
+ app identifier is passed in on initialization.
+ */
+
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ABReleaseNotesDownloader : NSObject
+
+/**
+ Returns a newly initialized downloader with the specified app identifier.
+ 
+ @param appIdentifier The unique ID of your app in the App Store.
+ 
+ @return A newly initialized `ABReleaseNotesDownloader` object.
+ */
 - (instancetype)initWithAppIdentifier:(NSString *)appIdentifier;
+
+/**
+ Responsible for checking the App Store for updates to the app identifier specified in initialization.
+ 
+ @param checker The block to execute after the update check finishes. This block has no return value, but has three parameters: a BOOL flag indicating whether the app has been updated, release notes, and a new version number. and takes no parameters.
+ */
 - (void)checkForUpdates:(void (^)(BOOL updated, NSString *releaseNotes, NSString *versionNumber))checker;
 @end
+
+NS_ASSUME_NONNULL_END

@@ -26,6 +26,12 @@
 
 #import <UIKit/UIKit.h>
 
+/**
+ A presentation controller used by `ABReleaseNotesViewController` to control the display of the 
+ release notes controller on screen. Designed to be used as-is, and you shouldn't have to interact
+ directly with this class.
+ */
+
 @interface ABReleaseNotesPresentationController : UIPresentationController
 
 @end
