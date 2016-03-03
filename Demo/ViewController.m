@@ -27,6 +27,11 @@
     [self.webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://www.apple.com"]]];
 
     self.releaseNotes = [[ABReleaseNotesViewController alloc] initWithAppIdentifier:@"329380089"];
+
+    // if this was a real app, I would set the mode property on the release notes controller to 'production':
+    // self.releaseNotes.mode = ABReleaseNotesViewControllerModeProduction;
+    // It is set by default to ABReleaseNotesViewControllerModeTesting, which means that it always appears:
+    self.releaseNotes.mode = ABReleaseNotesViewControllerModeTesting;
 }
 
 - (void)viewDidAppear:(BOOL)animated {

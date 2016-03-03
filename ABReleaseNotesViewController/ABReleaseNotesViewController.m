@@ -33,7 +33,7 @@ NSString * const ABReleaseNotesVersionUserDefaultsKey = @"ABReleaseNotesVersionU
 @interface ABReleaseNotesViewController ()<UIViewControllerTransitioningDelegate>
 @property(nonatomic,copy) NSString *appIdentifier;
 @property(nonatomic,strong) ABReleaseNotesDownloader *downloader;
-@property(nonatomic,strong) UIView *contentView;
+@property(nonatomic,strong) UIView *roundedCornerView;
 @property(nonatomic,strong) UIVisualEffectView *vibrancyView;
 @property(nonatomic,strong) UILabel *titleLabel;
 @property(nonatomic,strong) UITextView *bodyText;
@@ -82,7 +82,10 @@ NSString * const ABReleaseNotesVersionUserDefaultsKey = @"ABReleaseNotesVersionU
     _closeButtonTitle = NSLocalizedString(@"Dismiss", @"");
     
     _lineViewColor = [UIColor colorWithWhite:0.f alpha:0.25f];
-    
+
+    // this has to be created in the initializer to ensure that, when the release notes
+    // content is retrieved from the iTunes API, there is already a text view available
+    // to plug the content into.
     _bodyText = ({
         UITextView *textView = [[UITextView alloc] init];
         textView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -99,24 +102,9 @@ NSString * const ABReleaseNotesVersionUserDefaultsKey = @"ABReleaseNotesVersionU
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    self.contentView = [[UIView alloc] initWithFrame:self.view.bounds];
-    self.contentView.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
-    self.contentView.clipsToBounds = YES;
-    [self.view addSubview:self.contentView];
-
     self.view.layer.shadowColor = [UIColor colorWithRed:0.f green:0.f blue:0.25f alpha:1.f].CGColor;
     self.view.layer.shadowOpacity = 0.25f;
     self.view.layer.shadowRadius = 8.f;
-    self.view.layer.borderWidth = 1.f;
-    self.view.layer.borderColor = self.lineViewColor.CGColor;
-    [self createVisualEffectsViews];
-
-    UINavigationBar *navigationBar = [[UINavigationBar alloc] init];
-
-    NSString *title = self.mode == ABReleaseNotesViewControllerModeProduction ? self.title : [NSString stringWithFormat:@"TESTING - %@", self.title];
-    [navigationBar pushNavigationItem:[[UINavigationItem alloc] initWithTitle:title] animated:YES];
-
-    UIView *bottomEdge = [self.class makeLineViewWithColor:self.lineViewColor];
 
     UIButton *closeButton = ({
         UIButton *button = [UIButton buttonWithType:UIButtonTypeSystem];
@@ -129,16 +117,33 @@ NSString * const ABReleaseNotesVersionUserDefaultsKey = @"ABReleaseNotesVersionU
         button;
     });
 
-    NSArray *subviews = @[navigationBar, self.bodyText, bottomEdge, closeButton];
+    NSString *title = self.mode == ABReleaseNotesViewControllerModeProduction ? self.title : [NSString stringWithFormat:@"TESTING - %@", self.title];
+    UINavigationBar *navigationBar = [self createNavigationBarWithTitle:title];
 
-    UIStackView *stackView = [[UIStackView alloc] initWithArrangedSubviews:subviews];
-    stackView.frame = self.vibrancyView.contentView.bounds;
-    stackView.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
-    stackView.axis = UILayoutConstraintAxisVertical;
-    [self.vibrancyView.contentView addSubview:stackView];
+    NSArray *subviews = @[navigationBar, self.bodyText, [self.class makeLineViewWithColor:self.lineViewColor], closeButton];
+
+    [self createContainerViewsWithContentView:({
+        UIStackView *stackView = [[UIStackView alloc] initWithArrangedSubviews:subviews];
+        stackView.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
+        stackView.axis = UILayoutConstraintAxisVertical;
+        stackView;
+    })];
 }
 
-- (void)createVisualEffectsViews {
+- (UINavigationBar*)createNavigationBarWithTitle:(NSString*)title {
+    UINavigationBar *navigationBar = [[UINavigationBar alloc] init];
+    [navigationBar pushNavigationItem:[[UINavigationItem alloc] initWithTitle:title] animated:YES];
+    return navigationBar;
+}
+
+- (void)createContainerViewsWithContentView:(UIView*)contentView {
+
+    self.roundedCornerView = [[UIView alloc] initWithFrame:self.view.bounds];
+    self.roundedCornerView.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
+    self.roundedCornerView.clipsToBounds = YES;
+    self.roundedCornerView.layer.cornerRadius = 8.f;
+    [self.view addSubview:self.roundedCornerView];
+
     UIBlurEffect *blurEffect = [UIBlurEffect effectWithStyle:self.blurEffectStyle];
 
     UIVisualEffectView *background = ({
@@ -147,7 +152,7 @@ NSString * const ABReleaseNotesVersionUserDefaultsKey = @"ABReleaseNotesVersionU
         effectView.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
         effectView;
     });
-    [self.contentView addSubview:background];
+    [self.roundedCornerView addSubview:background];
 
     self.vibrancyView = ({
         UIVisualEffectView *v = [[UIVisualEffectView alloc] initWithEffect:blurEffect];
@@ -156,6 +161,9 @@ NSString * const ABReleaseNotesVersionUserDefaultsKey = @"ABReleaseNotesVersionU
         v;
     });
     [background.contentView addSubview:self.vibrancyView];
+
+    contentView.frame = self.vibrancyView.contentView.bounds;
+    [self.vibrancyView.contentView addSubview:contentView];
 }
 
 #pragma mark - Actions
