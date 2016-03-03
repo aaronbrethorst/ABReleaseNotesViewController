@@ -33,8 +33,6 @@ NSString * const ABReleaseNotesVersionUserDefaultsKey = @"ABReleaseNotesVersionU
 @interface ABReleaseNotesViewController ()<UIViewControllerTransitioningDelegate>
 @property(nonatomic,copy) NSString *appIdentifier;
 @property(nonatomic,strong) ABReleaseNotesDownloader *downloader;
-@property(nonatomic,strong) UIView *roundedCornerView;
-@property(nonatomic,strong) UIVisualEffectView *vibrancyView;
 @property(nonatomic,strong) UILabel *titleLabel;
 @property(nonatomic,strong) UITextView *bodyText;
 @property(nonatomic,copy) UIColor *lineViewColor;
@@ -118,52 +116,18 @@ NSString * const ABReleaseNotesVersionUserDefaultsKey = @"ABReleaseNotesVersionU
     });
 
     NSString *title = self.mode == ABReleaseNotesViewControllerModeProduction ? self.title : [NSString stringWithFormat:@"TESTING - %@", self.title];
-    UINavigationBar *navigationBar = [self createNavigationBarWithTitle:title];
+    UINavigationBar *navigationBar = [self.class createNavigationBarWithTitle:title];
 
     NSArray *subviews = @[navigationBar, self.bodyText, [self.class makeLineViewWithColor:self.lineViewColor], closeButton];
 
-    [self createContainerViewsWithContentView:({
+    UIView *view = [self.class createEffectsViewsWithFrame:self.view.bounds blurEffectStyle:self.blurEffectStyle contentView:({
         UIStackView *stackView = [[UIStackView alloc] initWithArrangedSubviews:subviews];
         stackView.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
         stackView.axis = UILayoutConstraintAxisVertical;
         stackView;
     })];
-}
 
-- (UINavigationBar*)createNavigationBarWithTitle:(NSString*)title {
-    UINavigationBar *navigationBar = [[UINavigationBar alloc] init];
-    [navigationBar pushNavigationItem:[[UINavigationItem alloc] initWithTitle:title] animated:YES];
-    return navigationBar;
-}
-
-- (void)createContainerViewsWithContentView:(UIView*)contentView {
-
-    self.roundedCornerView = [[UIView alloc] initWithFrame:self.view.bounds];
-    self.roundedCornerView.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
-    self.roundedCornerView.clipsToBounds = YES;
-    self.roundedCornerView.layer.cornerRadius = 8.f;
-    [self.view addSubview:self.roundedCornerView];
-
-    UIBlurEffect *blurEffect = [UIBlurEffect effectWithStyle:self.blurEffectStyle];
-
-    UIVisualEffectView *background = ({
-        UIVisualEffectView *effectView = [[UIVisualEffectView alloc] initWithEffect:blurEffect];
-        effectView.frame = self.view.bounds;
-        effectView.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
-        effectView;
-    });
-    [self.roundedCornerView addSubview:background];
-
-    self.vibrancyView = ({
-        UIVisualEffectView *v = [[UIVisualEffectView alloc] initWithEffect:blurEffect];
-        v.frame = background.contentView.bounds;
-        v.autoresizingMask = UIViewAutoresizingFlexibleHeight|UIViewAutoresizingFlexibleWidth;
-        v;
-    });
-    [background.contentView addSubview:self.vibrancyView];
-
-    contentView.frame = self.vibrancyView.contentView.bounds;
-    [self.vibrancyView.contentView addSubview:contentView];
+    [self.view addSubview:view];
 }
 
 #pragma mark - Actions
@@ -230,4 +194,44 @@ NSString * const ABReleaseNotesVersionUserDefaultsKey = @"ABReleaseNotesVersionU
     [v addConstraint:[NSLayoutConstraint constraintWithItem:v attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:0 multiplier:0 constant:1]];
     return v;
 }
+
+
+
++ (UINavigationBar*)createNavigationBarWithTitle:(NSString*)title {
+    UINavigationBar *navigationBar = [[UINavigationBar alloc] init];
+    [navigationBar pushNavigationItem:[[UINavigationItem alloc] initWithTitle:title] animated:YES];
+    return navigationBar;
+}
+
++ (UIView*)createEffectsViewsWithFrame:(CGRect)frame blurEffectStyle:(UIBlurEffectStyle)blurEffectStyle contentView:(UIView*)contentView {
+
+    UIView *roundedCornerView = [[UIView alloc] initWithFrame:frame];
+    roundedCornerView.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
+    roundedCornerView.clipsToBounds = YES;
+    roundedCornerView.layer.cornerRadius = 8.f;
+
+    UIBlurEffect *blurEffect = [UIBlurEffect effectWithStyle:blurEffectStyle];
+
+    UIVisualEffectView *background = ({
+        UIVisualEffectView *effectView = [[UIVisualEffectView alloc] initWithEffect:blurEffect];
+        effectView.frame = frame;
+        effectView.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
+        effectView;
+    });
+    [roundedCornerView addSubview:background];
+
+    UIVisualEffectView *vibrancyView = ({
+        UIVisualEffectView *v = [[UIVisualEffectView alloc] initWithEffect:blurEffect];
+        v.frame = background.contentView.bounds;
+        v.autoresizingMask = UIViewAutoresizingFlexibleHeight|UIViewAutoresizingFlexibleWidth;
+        v;
+    });
+    [background.contentView addSubview:vibrancyView];
+
+    contentView.frame = vibrancyView.contentView.bounds;
+    [vibrancyView.contentView addSubview:contentView];
+
+    return roundedCornerView;
+}
+
 @end
