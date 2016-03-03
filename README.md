@@ -36,6 +36,13 @@ Issues, Pull Requests, etc.
 
 Issues, bug fixes, and new features are always welcome. Priority will be given to issues that are accompanied by patches, but I will do my best to stay on top of problems with the code.
 
+TODOs
+====
+
+- [ ] Cocoapods
+- [ ] Carthage
+- [ ] Optional Markdown formatting of release notes
+
 Credits
 ====
 
