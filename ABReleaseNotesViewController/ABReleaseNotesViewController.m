@@ -154,7 +154,7 @@ NSString * const ABReleaseNotesVersionUserDefaultsKey = @"ABReleaseNotesVersionU
             return;
         }
 
-        if ([defaultsAppVersion isEqual:[self.class appVersionNumber]]) {
+        if ([defaultsAppVersion compare:self.class.appVersionNumber options:NSNumericSearch] != NSOrderedDescending) {
             // no new app version installed since last launch.
             return;
         }
