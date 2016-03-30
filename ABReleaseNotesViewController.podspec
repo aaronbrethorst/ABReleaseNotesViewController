@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = "ABReleaseNotesViewController"
-  s.version          = "0.1.0"
+  s.version          = "0.1.1"
   s.summary          = "The easiest way to display your App Store release notes inside your app after an update."
   s.description      = <<-DESC
 Since iOS 7, users have been opted in to automatic updates of their apps from the App Store. This is great for ensuring that our users are always on the latest versions of our products, but it means that it can be much more difficult to tell them about what's new and different in our updates. ABReleaseNotesViewController fixes that by displaying your app's release notes from the App Store inside your app on the first launch after an update.
